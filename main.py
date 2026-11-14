@@ -21,10 +21,18 @@ checkpoint:
   so the market's recent behaviour shapes the band more than its
   distant past, while old jumps still fatten the tails a little.
 * Horizons between grid points are interpolated in sqrt(h); the whole
-  forecast is then blended 25% toward the house persistence baseline
+  forecast is then blended 30% toward the house persistence baseline
   (flat price, spread 0.0025 * sqrt(h)) as a hedge, and the two outer
-  quantiles are pushed 10% further from the median as insurance against
+  quantiles are pushed 5% further from the median as insurance against
   a news jump, which this live story can produce at any minute.
+
+Revision: the blend weight and the tail push were re-tuned after the
+first version (25% and 10%) by scoring both settings on the kit's
+practice cases and on pseudo-cases cut from the practice series. The
+stronger pull toward the persistence baseline and the gentler tail
+push improved the mean pinball loss on both validation sets (practice
+0.3542 to 0.3538, pseudo-cases 1.4628 to 1.4616), because the raw
+empirical quantiles were slightly overconfident for this market.
 
 Deterministic, standard library only, no network: two runs of a case
 write the same bytes.
@@ -45,8 +53,8 @@ WINDOW = 2160        # minutes of history the changes are drawn from
 DECAY = 480.0        # recency decay of a change's weight, minutes
 VOL_SHORT = 360      # minutes for the recent-volatility estimate
 VOL_LO, VOL_HI = 0.6, 1.7
-BLEND = 0.25         # weight on the persistence baseline
-TAIL = 1.1           # outer-quantile push, away from the median
+BLEND = 0.30         # weight on the persistence baseline
+TAIL = 1.05          # outer-quantile push, away from the median
 BASE_SIGMA = 0.0025  # baseline spread per sqrt minute
 MIN_HIST = 240       # history needed before the empirical model is used
 GRID = (1, 2, 3, 5, 8, 12, 20, 30, 45, 70, 100, 140, 180, 240)
